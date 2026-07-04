@@ -63,6 +63,14 @@ export interface ItemRemotePayload {
   sets: Record<string, SetDefinition>;
 }
 
+/** tomes.json remote payload (also used by load_tome). */
+export interface TomeRemotePayload {
+  tomes: ItemStatMap[];
+}
+
+/** major_ids_clean.json keyed by internal id name. */
+export type MajorIdDatabase = Record<string, MajorId>;
+
 export interface ItemListEntry {
   name: string;
   [key: string]: unknown;

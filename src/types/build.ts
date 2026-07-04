@@ -114,31 +114,40 @@ export interface LegacyDecodedBuild extends DecodedBuild {
   powdering: PowderString[];
 }
 
-/** Flag values from encoding_consts.json (subset used by build encoder). */
+/** Named flag map written into encoding_consts.json (includes BITLEN). */
+export interface EncodingFlagMap {
+  BITLEN: number;
+  [flag: string]: number;
+}
+
+/** Full encoding_consts.json shape consumed by load_item and build_encode_decode. */
 export interface EncodingConstants {
-  EQUIPMENT_KIND: { NORMAL: number; CRAFTED: number; CUSTOM: number; BITLEN: number };
+  EQUIPMENT_KIND: EncodingFlagMap & { NORMAL: number; CRAFTED: number; CUSTOM: number };
+  EQUIPMENT_POWDERS_FLAG: EncodingFlagMap & { NO_POWDERS: number; HAS_POWDERS: number };
   EQUIPMENT_NUM: number;
+  POWDERABLE_EQUIPMENT_NUM: number;
   ITEM_ID_BITLEN: number;
-  TOMES_FLAG: { NO_TOMES: number; HAS_TOMES: number; BITLEN: number };
-  TOME_SLOT_FLAG: { UNUSED: number; USED: number; BITLEN: number };
+  TOMES_FLAG: EncodingFlagMap & { NO_TOMES: number; HAS_TOMES: number };
+  TOME_SLOT_FLAG: EncodingFlagMap & { UNUSED: number; USED: number };
   TOME_NUM: number;
   TOME_ID_BITLEN: number;
-  SP_FLAG: { AUTOMATIC: number; ASSIGNED: number; BITLEN: number };
-  SP_ELEMENT_FLAG: { ELEMENT_UNASSIGNED: number; ELEMENT_ASSIGNED: number; BITLEN: number };
-  SP_TYPES: number;
-  MAX_SP_BITLEN: number;
-  LEVEL_FLAG: { MAX: number; OTHER: number; BITLEN: number };
-  LEVEL_BITLEN: number;
-  MAX_LEVEL: number;
-  ASPECTS_FLAG: { NO_ASPECTS: number; HAS_ASPECTS: number; BITLEN: number };
-  ASPECT_SLOT_FLAG: { UNUSED: number; USED: number; BITLEN: number };
+  ASPECT_TIERS: number;
+  ASPECTS_FLAG: EncodingFlagMap & { NO_ASPECTS: number; HAS_ASPECTS: number };
+  ASPECT_SLOT_FLAG: EncodingFlagMap & { UNUSED: number; USED: number };
   NUM_ASPECTS: number;
   ASPECT_ID_BITLEN: number;
   ASPECT_TIER_BITLEN: number;
-  EQUIPMENT_POWDERS_FLAG: { NO_POWDERS: number; HAS_POWDERS: number; BITLEN: number };
-  POWDER_REPEAT_OP: { REPEAT: number; NO_REPEAT: number; BITLEN: number };
-  POWDER_REPEAT_TIER_OP: { REPEAT_TIER: number; CHANGE_POWDER: number; BITLEN: number };
-  POWDER_CHANGE_OP: { NEW_POWDER: number; NEW_ITEM: number; BITLEN: number };
+  MAX_SP: number;
+  SP_FLAG: EncodingFlagMap & { ASSIGNED: number; AUTOMATIC: number };
+  SP_ELEMENT_FLAG: EncodingFlagMap & { ELEMENT_UNASSIGNED: number; ELEMENT_ASSIGNED: number };
+  SP_TYPES: number;
+  MAX_SP_BITLEN: number;
+  LEVEL_FLAG: EncodingFlagMap & { MAX: number; OTHER: number };
+  LEVEL_BITLEN: number;
+  MAX_LEVEL: number;
+  POWDER_REPEAT_OP: EncodingFlagMap & { REPEAT: number; NO_REPEAT: number };
+  POWDER_REPEAT_TIER_OP: EncodingFlagMap & { REPEAT_TIER: number; CHANGE_POWDER: number };
+  POWDER_CHANGE_OP: EncodingFlagMap & { NEW_POWDER: number; NEW_ITEM: number };
   POWDER_ID_BITLEN: number;
   POWDER_WRAPPER_BITLEN: number;
   POWDER_TIERS: number;

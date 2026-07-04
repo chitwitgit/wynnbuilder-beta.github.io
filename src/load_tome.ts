@@ -7,14 +7,10 @@
 import { tome_types } from '@/build_utils';
 import { Loader } from '@/loader';
 import { clean_item } from '@/load_item';
-import type { ItemStatMap } from '@/types/item';
+import type { ItemStatMap, TomeRemotePayload } from '@/types/item';
 import type { JsonPayload, RejectFn } from '@/types/loader';
 
 const TOME_DB_VERSION = 17;
-
-interface TomeRemotePayload {
-  tomes: ItemStatMap[];
-}
 
 export let tomes: ItemStatMap[];
 export let tomeMap: Map<string, ItemStatMap>;

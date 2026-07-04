@@ -15,7 +15,7 @@ The Builder encoder encodes the following information:
 Anything that needs to be uniquely identified (i.e equipment, tomes and aspects) has a unique ID associated with it. the IDs are stable and do not change between versions, to preserve backwards compatibility. Those IDs are the information stored in the URL, not the names of the items.
 
 For maximum efficiency, each version we calculate the maximum amount of bits required to store a particular type of ID and store it in a data file, which is then loaded before the decoding process. For example, if the largest ID for an item is 4975, the minimum number of bits required to store all IDs would be 12. In general, we store `floor(log_2(maxId)) + 1` for each identifiable type (if 0 is used to represent a null item, maxId is increased by 1 before calculation the length).
-This generation done automatically by `py_script/encoding_gen_const.py` which also verifies certain aspects to make sure we maintain backwards compatibility.
+This generation done automatically by `scripts/data-pipeline/encoding-gen-const.ts` (`npm run data -- encoding-gen-const <version>`), which also verifies certain aspects to make sure we maintain backwards compatibility.
 
 # Specification - V12
 This section details each part of the encoded vectors and how to interpret them.
@@ -23,7 +23,7 @@ in case of changes to the specification, an additional section titled "Specifica
 
 - **Lengths denoted as "Dynamic"** are automatically generated from the versioned data in `data/*.json` files and from manually tracked data such as max in-game level, number of powder tiers etc.
 - **String values in SCREAMING_CASE without an explicit associated integer value** (example of an associated value: `"SOME_NAME"=1`) are essentially enum variants. They need not be stable between versions.
-  - These are technically generated separately for each Wynn data version, but the generator script should be used as a reference for their values: `py_script/encoding_gen_const.py`.
+  - These are technically generated separately for each Wynn data version, but the generator script should be used as a reference for their values: `scripts/data-pipeline/encoding-gen-const.ts`.
 - **Optional fields** are fields that are only encoded under specific conditions which are described in the same section as they're declared.
 - **iff fields** are fields that must be encoded under the specified condition.
 

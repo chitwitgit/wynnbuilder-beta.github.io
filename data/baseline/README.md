@@ -9,13 +9,15 @@ This directory contains the **source-of-truth** data files that are edited by ha
 | `data/baseline/*.json` | Hand-edited source-of-truth data (atree, major IDs, aspects, recipes, map locations, territories) |
 | `data/baseline/maps/` | Persistent ID/name mappings that must stay stable across runs (tracked) |
 | `data/baseline/compressed/` | Compressed copies of source data |
-| `data/temp/` | Generated intermediate outputs from `py_script/` (gitignored) |
+| `data/temp/` | Generated intermediate outputs from `scripts/data-pipeline/` (gitignored) |
 | `data/<ver>/` | Final per-version data consumed by the app |
+
+Pipeline scripts run via `npm run data -- <script>` (see `scripts/data-pipeline/README.md`).
 
 ## Updating ability trees / major IDs
 
 1. Edit `atree_constants.json` and/or `major_ids_clean.json` in this directory.
-2. From `py_script/`, run `python3 atree-generateID.py` — writes minified output to `data/temp/`.
+2. From the repo root, run `npm run data -- atree-generate-id` — writes minified output to `data/temp/`.
 3. Copy the output files from `data/temp/` into the target `data/<ver>/` directory (see full suite below).
 
 ## Generating the full data suite for a new version
@@ -33,14 +35,13 @@ mkdir -p data/$VER
 #    Reads: data/baseline/maps/{id,ing,tome}_map.json (updated in place),
 #           data/baseline/{clean,ingreds_clean,tomes,major_ids_clean}.json
 #    Writes: data/temp/{item_out,ing_out,tome_out,major_ids_clean,dump}.json
-cd py_script
-python3 v3_process_items.py
+npm run data -- v3-process-items
 
 # 3. (Optional) Update recipes — writes data/temp/recipes_clean.json
-python3 process_recipes.py ../data/baseline/recipes.json ../data/temp/recipes_clean.json
+npm run data -- process-recipes data/baseline/recipes.json data/temp/recipes_clean.json
 
 # 4. Check for new aspects — writes data/temp/aspects.json, data/temp/api_aspects.json
-python3 get_aspects.py
+npm run data -- get-aspects
 
 # 5. Manually review data/temp/ outputs and promote approved changes into
 #    data/baseline/ by copying:
@@ -53,7 +54,7 @@ python3 get_aspects.py
 #    Also update data/baseline/atree_constants.json by hand as needed.
 
 # 6. Compile/minify atree, major IDs, aspects — writes to data/temp/
-python3 atree-generateID.py
+npm run data -- atree-generate-id
 
 # 7. dps_data.json is maintained in data/baseline/ and is propagated unchanged to
 #    the version directory in step 8 below — there is no generation step.
@@ -61,28 +62,28 @@ python3 atree-generateID.py
 # 8. Copy all generated files into the version directory.
 #    Minified atree/aspects/majid come straight from data/temp/;
 #    items/ingreds/tomes/recipes/dps pull from data/baseline/ (the reviewed sources).
-cp ../data/temp/atree_constants_min.json ../data/$VER/atree.json
-cp ../data/temp/aspects_min.json         ../data/$VER/aspects.json
-cp ../data/temp/major_ids_min.json       ../data/$VER/majid.json
-python3 compress_json.py ../data/baseline/clean.json         ../data/$VER/items.json
-python3 compress_json.py ../data/baseline/clean.json         ../data/baseline/compressed/compress.json
-python3 compress_json.py ../data/baseline/ingreds_clean.json ../data/$VER/ingreds.json
-python3 compress_json.py ../data/baseline/ingreds_clean.json         ../data/baseline/compressed/ingreds_compress.json
-python3 compress_json.py ../data/baseline/tomes.json         ../data/$VER/tomes.json
-python3 compress_json.py ../data/baseline/recipes_clean.json       ../data/$VER/recipes.json
-python3 compress_json.py ../data/baseline/recipes_clean.json       ../data/baseline/compressed/recipes_compress.json
-cp ../data/baseline/dps_data.json ../data/$VER/dps_data.json
+cp data/temp/atree_constants_min.json data/$VER/atree.json
+cp data/temp/aspects_min.json         data/$VER/aspects.json
+cp data/temp/major_ids_min.json       data/$VER/majid.json
+npm run data -- compress-json data/baseline/clean.json         data/$VER/items.json
+npm run data -- compress-json data/baseline/clean.json         data/baseline/compressed/compress.json
+npm run data -- compress-json data/baseline/ingreds_clean.json data/$VER/ingreds.json
+npm run data -- compress-json data/baseline/ingreds_clean.json data/baseline/compressed/ingreds_compress.json
+npm run data -- compress-json data/baseline/tomes.json         data/$VER/tomes.json
+npm run data -- compress-json data/baseline/recipes_clean.json data/$VER/recipes.json
+npm run data -- compress-json data/baseline/recipes_clean.json data/baseline/compressed/recipes_compress.json
+cp data/baseline/dps_data.json data/$VER/dps_data.json
 
 # 8b. Refresh the cutting-edge compressed copies of the hand-edited map/territory
 #     sources (loaded directly by load_map.js from data/baseline/compressed/).
-python3 compress_json.py ../data/baseline/terrs_clean.json         ../data/baseline/compressed/terrs_compress.json
-python3 compress_json.py ../data/baseline/maploc_clean.json        ../data/baseline/compressed/maploc_compress.json
+npm run data -- compress-json data/baseline/terrs_clean.json  data/baseline/compressed/terrs_compress.json
+npm run data -- compress-json data/baseline/maploc_clean.json data/baseline/compressed/maploc_compress.json
 
 # 9. Generate encoding constants (preview first, then write)
 #    Preview prints to stdout; --write saves to data/temp/encoding_consts.json
 #    AND data/$VER/encoding_consts.json
-python3 encoding_gen_const.py $VER
-python3 encoding_gen_const.py $VER --write
+npm run data -- encoding-gen-const $VER
+npm run data -- encoding-gen-const $VER --write
 ```
 
 ### Quick one-liner (atree/aspects/majid/items only)
@@ -91,9 +92,8 @@ For smaller updates that only touch atree, aspects, major IDs, or items:
 
 ```bash
 VER=X.X.X.X
-cd py_script
 
-python atree-generateID.py && cp ../data/temp/atree_constants_min.json ../data/$VER/atree.json && cp ../data/temp/aspects_min.json ../data/$VER/aspects.json && cp ../data/temp/major_ids_min.json ../data/$VER/majid.json && python compress_json.py ../data/baseline/clean.json ../data/$VER/items.json && python compress_json.py ../data/baseline/clean.json ../data/baseline/compressed/compress.json
+npm run data -- atree-generate-id && cp data/temp/atree_constants_min.json data/$VER/atree.json && cp data/temp/aspects_min.json data/$VER/aspects.json && cp data/temp/major_ids_min.json data/$VER/majid.json && npm run data -- compress-json data/baseline/clean.json data/$VER/items.json && npm run data -- compress-json data/baseline/clean.json data/baseline/compressed/compress.json
 ```
 
 ## Bumping DB version constants
@@ -108,3 +108,7 @@ When baseline data files change, the corresponding IndexedDB version constants i
 | `aspects.json` | `ASPECT_DB_VERSION` | `js/load_aspect.js` |
 
 Note: `atree.json` and `majid.json` are loaded directly from the versioned data directory (not via IndexedDB), so they don't have a DB version constant.
+
+## Remaining Python scripts
+
+Ad-hoc utilities without TypeScript ports remain in `py_script/` (`get.py`, `get_atree.py`, format converters, `research/`). See `py_script/README.md`.

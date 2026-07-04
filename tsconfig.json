@@ -9,6 +9,7 @@
     "allowJs": true,
     "checkJs": false,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "skipLibCheck": true,
     "isolatedModules": true,
     "esModuleInterop": true,
@@ -19,6 +20,6 @@
       "@css/*": ["css/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "vite.config.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "vite.config.ts", "scripts/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
